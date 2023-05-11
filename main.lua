@@ -1,5 +1,8 @@
 require "TSLib"
+require "ts"
 w, h = getScreenSize()
+logStr = ""
+imgstr = ""
 
 ------需要根据个人信息修改
 --钉钉bundleID
@@ -9,15 +12,25 @@ user = "XXXXXXX"
 --钉钉密码
 pwd = "XXXXX"
 
+inWorkStartTime = "07:00" --上班打卡最早时间
+inWorkEndTime = "08:30" --上班最晚打卡时间
+outWorkStartTime = "18:05" --下班最早打卡时间
+outWorkEndTime = "21:00" --下班最晚打卡时间
+
 ---------------------mysql数据库信息------------------
 isMysql = true --是否使用数据库   flase--不使用数据库
 --数据库名称
-name = "XXXXXXX"
-username = "XXX"
-password = "XXXXXXXX"
-IP = "XXXXXXXXxX"
-port = "XXXxxXX"
+name = "autoopen-dingding"
+username = "root"
+password = "xxxxxxxxxxxx"
+IP = "xxxxxxxxx"
+port = 3306
 ----------------------------------------函数-------------------------------------------------------------------------
+--找到打卡时间
+--while true 说是尽量别用，所以这一块就用时间差值，来sleep
+function waitTime()
+end
+
 --唤醒屏幕调转到后台
 function startON()
     startCurrent_text = os.date("%Y-%m-%d %X", getNetTime()) --格式化时间
@@ -28,6 +41,7 @@ function startON()
     flag = deviceIsLock()
     if flag == 0 then
         toast("屏幕未锁定!", 5)
+        logStr = logStr .. "屏幕未锁定!#"
     elseif tonumber(t[1]) >= 10 then
         doublePressHomeKey()
         unlockDevice()
@@ -36,12 +50,14 @@ function startON()
         pressHomeKey(0)
         pressHomeKey(1)
         toast("屏幕已解锁!", 5)
+        logStr = logStr .. "屏幕已解锁!#"
     else
         pressHomeKey(0)
         pressHomeKey(1)
         --解锁屏幕
         unlockDevice()
         toast("屏幕已解锁!", 5)
+        logStr = logStr .. "屏幕已解锁!#"
     end
 end
 
@@ -67,6 +83,7 @@ function openDingding()
     if flag == 0 then
         runApp(bundleID)
         toast("钉钉已打开!", 5)
+        logStr = logStr .. "钉钉已打开!#"
     end
 end
 
@@ -79,6 +96,7 @@ function closeDingding()
         closeApp(bundleID)
         endCurrent_text = os.date("%Y-%m-%d %X", getNetTime()) --格式化时间
         toast("钉钉已关闭!", 5)
+        logStr = logStr .. "钉钉已关闭!#"
     end
 end
 
@@ -88,6 +106,7 @@ function queryTancuan()
     x, y = findImage("弹窗确定标志.jpg", 0, 0, w - 1, h - 1) --找钉钉图标
     if x ~= -1 and y ~= -1 then --如果在指定区域找到某图片符合条件
         tap(x, y, 50, "点击.jpg", 1) --点击确定按钮
+        logStr = logStr .. "点击弹窗确定标志#"
     end
 end
 
@@ -120,6 +139,7 @@ function inputPwd()
             x2, y2 = findImage("登录标志.jpg", 0, 0, w - 1, h - 1) --找登录按钮
             if x2 ~= -1 and y2 ~= -1 then --如果在指定区域找到某图片符合条件  else --如果找不到符合条件的图片
                 tap(x2, y2, 50, "点击.jpg", 1)
+                logStr = logStr .. "点击登录标志!#"
             else --如果找不到符合条件的图片
                 toast("未找到登录按钮!", 5)
             end
@@ -128,6 +148,7 @@ function inputPwd()
         end
     else --如果找不到符合条件的图片
         toast("跳过账号密码登录!", 5)
+        logStr = logStr .. "跳过账号密码登录!#"
     end
 end
 
@@ -136,6 +157,7 @@ function transferWorkbench()
     x, y = findImage("工作台标志.jpg", 0, 0, w - 1, h - 1) --找工作台按钮
     if x ~= -1 and y ~= -1 then --如果在指定区域找到某图片符合条件
         tap(x + 20, y + 20, 50, "点击.jpg", 1) --点击确定按钮
+        logStr = logStr .. "点击工作台标志!#"
     end
 end
 
@@ -144,8 +166,7 @@ function transferAttendance()
     x, y = findImage("考勤打卡图标.jpg", 0, 0, w - 1, h - 1) --找考勤打开按钮
     if x ~= -1 and y ~= -1 then --如果在指定区域找到某图片符合条件
         tap(x + 80, y + 80, 50, "点击.jpg", 1) --点击确定按钮
-        else
-         toast("未找到考勤打卡图标", 5)   
+        logStr = logStr .. "点击考勤打卡图标!#"
     end
 end
 
@@ -157,8 +178,10 @@ function isWork()
         os.time({year = nowTime.year, month = nowTime.month, day = nowTime.day, hour = 12, min = 0, sec = 0}) --当天12点
     if exampletime <= exampletime12 then -- 小于等于12点
         dak("上班卡.jpg")
+        logStr = logStr .. "点击上班卡!#"
     else -- 下班卡
         dak("下班卡.jpg")
+        logStr = logStr .. "点击下班卡!#"
     end
 end
 
@@ -167,13 +190,37 @@ function dak(img)
     x, y = findImage(img, 0, 0, w - 1, h - 1) --找上班卡
     if x ~= -1 and y ~= -1 then --如果在指定区域找到某图片符合条件
         toast("已打卡!", 5)
+        logStr = logStr .. "已打卡!#"
     else -- 打卡
         x1, y1 = findImage("打卡标志.jpg", 0, 0, w - 1, h - 1) --找上班卡
         if x1 ~= -1 and y1 ~= -1 then --如果在指定区域找到某图片符合条件
             tap(x1 + 10, y1 + 10, 50, "点击.jpg", 1)
+            logStr = logStr .. "点击打卡标志#"
         end
     end
 end
+
+--图片转base64
+function _ReadFileBase64(path)
+    f = io.open(path, "rb")
+    if f == null then
+        return null
+    end
+    bytes = f:read("*all")
+    f:close()
+    return bytes:base64_encode()
+end
+
+--截图打卡情况
+function shotimg()
+    now_text = os.date("%Y-%m-%d %X", getNetTime())
+    path = userPath() .. "/res/tessdata/" .. now_text .. ".jpg"
+    snapshot(path, 0, 0, w - 1, h - 1,0.5)
+    --需要下载 ts.so
+    imgstr = imageBase64(path)
+end
+
+--插入日志
 function insertMysqlLog()
     if isMysql then
         local luasql = require "luasql.mysql"
@@ -185,10 +232,11 @@ function insertMysqlLog()
             -- 数据库操作语句
             startCurrent_text = [[']] .. startCurrent_text .. [[']]
             endCurrent_text = [[']] .. endCurrent_text .. [[']]
+            logStr = [[']] .. logStr .. [[']]
+            imgstr = [[']] .. imgstr .. [[']]
             sqls =
-                "insert into run_time_log(start_time,end_time,status) values(" ..
-                startCurrent_text .. "," .. endCurrent_text .. ",'1')"
-            toast(sqls, 5)
+                "insert into run_time_log(start_time,end_time,log_str,daka_img,status) values(" ..
+                startCurrent_text .. "," .. endCurrent_text .. "," .. logStr .. "," .. imgstr .. ",'1')"
             conn:execute(sqls)
             --关闭数据库
             conn:close()
@@ -202,20 +250,27 @@ function insertMysqlLog()
         toast("不使用数据库!")
     end
 end
----------------------------------------函数调用---------------------------------------------------------------------------
 
-startON()
-mSleep(3000)
-openDingding()
-mSleep(5000)
-queryTancuan()
-mSleep(5000)
-inputPwd()
-mSleep(5000)
-transferWorkbench()
-mSleep(5000)
-transferAttendance()
-mSleep(5000)
-isWork()
-closeDingding()
-insertMysqlLog()
+--启动操作打卡的脚本
+function start()
+    startON()
+    mSleep(3000)
+    openDingding()
+    mSleep(5000)
+    queryTancuan()
+    mSleep(5000)
+    inputPwd()
+    mSleep(5000)
+    transferWorkbench()
+    mSleep(5000)
+    transferAttendance()
+    mSleep(5000)
+    isWork()
+    mSleep(5000)
+    shotimg()
+    mSleep(10000)
+    closeDingding()
+    insertMysqlLog()
+end
+---------------------------------------函数调用---------------------------------------------------------------------------
+start()
