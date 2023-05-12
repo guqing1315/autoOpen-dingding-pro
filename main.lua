@@ -22,8 +22,8 @@ isMysql = true --是否使用数据库   flase--不使用数据库
 --数据库名称
 name = "autoopen-dingding"
 username = "root"
-password = "xxxxxxxxxxxx"
-IP = "xxxxxxxxx"
+password = "XXX"
+IP = "XXXXXXXXXX"
 port = 3306
 ----------------------------------------函数-------------------------------------------------------------------------
 --找到打卡时间
@@ -105,7 +105,7 @@ end
 function queryTancuan()
     x, y = findImage("弹窗确定标志.jpg", 0, 0, w - 1, h - 1) --找钉钉图标
     if x ~= -1 and y ~= -1 then --如果在指定区域找到某图片符合条件
-        tap(x, y, 50, "点击.jpg", 1) --点击确定按钮
+        tap(x, y+10, 50, "点击.jpg", 1) --点击确定按钮
         logStr = logStr .. "点击弹窗确定标志#"
     end
 end
@@ -237,6 +237,7 @@ function insertMysqlLog()
             sqls =
                 "insert into run_time_log(start_time,end_time,log_str,daka_img,status) values(" ..
                 startCurrent_text .. "," .. endCurrent_text .. "," .. logStr .. "," .. imgstr .. ",'1')"
+            conn:execute[[set names utf8]]
             conn:execute(sqls)
             --关闭数据库
             conn:close()
