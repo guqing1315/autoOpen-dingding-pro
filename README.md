@@ -3,9 +3,9 @@
 1. 增加界面ui,将需要配置到代码的参数都可通过页面进行配置，无需在修改代码；
 2. 支持钉钉在不开极速打卡的情况下，可以自动跳转到钉钉打卡页面，进行打卡。因为发现部分时候，打开钉钉之后，极速打卡不好使，没有进行打卡，所以增该功能（有多个团队时，请提前切换好到对应需要打卡的团队，后期可增加自动选择到对应的团队）；
 3. 增加选择在某一个时间段内进行打卡，可防止触动精灵的定时功能失效，以及每次打卡都是固定时间点的问题。
-4. 增加操作日志以及打卡成功截图到到数据库，可以方便在其他地方查看打卡情况，具体查看日志信息autoOpen-dingding-logsUI（https://github.com/guqing1315/autoOpen-dingding-logsUI）
+4. 增加操作日志以及打卡成功截图到到数据库，可以方便在其他地方查看打卡情况，具体查看日志信息autoOpen-dingding-logsUI（https://github.com/guqing1315/autoOpen-dingding-logsUI )
 5. 增加远程操作手机脚本功能（暂定）
-6. 增加脚本deviceInfo.lua用于将手机设备信息：型号，版本号、电量等信息到后台数据库日志，用于远程查看设备信息autoOpen-dingding-logsUI（https://github.com/guqing1315/autoOpen-dingding-logsUI）
+6. 增加脚本deviceInfo.lua用于将手机设备信息：型号，版本号、电量等信息到后台数据库日志，用于远程查看设备信息autoOpen-dingding-logsUI（https://github.com/guqing1315/autoOpen-dingding-logsUI )
 
 
  
