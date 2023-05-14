@@ -1,8 +1,8 @@
 --数据库名称
 name = "autoopen-dingding"
 username = "root"
-password = "xxx"
-IP = "xxxx"
+password = "xxxx"
+IP = "xxxxxxx"
 port = 3306
 
 --插入数据库
@@ -48,4 +48,15 @@ function insertMysql()
     end
 end
 
+function isLock()
+flag = deviceIsLock();      
+if flag == 0 then
+    lockDevice(); 
+    lua_exit();
+    mSleep(1000)
+end
+    end
+
 insertMysql()
+mSleep(1000)
+isLock()
